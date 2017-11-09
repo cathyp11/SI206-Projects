@@ -62,6 +62,7 @@ def grab_headlines():
     	read = headline.text.strip()
         # split the string and list all the titles as list
     	most = read.split("\n")
+    print(urllib.request.urlopen(url).read())
     return most
 
 
@@ -103,6 +104,8 @@ def get_umsi_data():
         umsi_titles[name] = title
     return umsi_titles
 
+
+
 ## PART 3 (b) Define a function called num_students.  
 ## INPUT: The dictionary from get_umsi_data().
 ## OUTPUT: Return number of PhD students in the data.  (Don't forget, I may change the input data)
@@ -115,8 +118,6 @@ def num_students(data):
         if person == 'PhD student':
             count += 1
     return count
-    
-
 
 ########### TESTS; DO NOT CHANGE ANY CODE BELOW THIS LINE! ###########
 def test(got, expected, pts):
