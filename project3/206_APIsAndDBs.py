@@ -91,8 +91,10 @@ umich_tweets = get_user_tweets('umich')
 conn = sqlite3.connect('206_APIsAndDBs.sqlite')
 cur = conn.cursor()
 
+# if the table already exist, drop it
 cur.execute('DROP TABLE IF EXISTS Users')
 cur.execute('DROP TABLE IF EXISTS Tweets')
+# create tables Users and Tweets with columns
 cur.execute('''CREATE TABLE Users (user_id TEXT PRIMARY KEY, screen_name TEXT, num_favs INTEGER, description TEXT)''')
 cur.execute('''CREATE TABLE Tweets (tweet_id TEXT PRIMARY KEY UNIQUE, text TEXT, user_posted TEXT REFERENCES Users(user_id), time_posted DATETIME, retweets INTEGER)''')
 
@@ -106,13 +108,14 @@ for i in umich_tweets:
 	for k in i['entities']['user_mentions']:
 		ids = k['id']
 		names = k['screen_name']
-		# getting more information on users that are mentioned
+		# getting more information on users that are mentioned by using tweepy method
 		users = api.get_user(names)
 		favs = users.get('favourites_count')
 		des = users.get('description')
 		# ignore if user_id already exists
 		cur.execute('''INSERT or IGNORE INTO Users (user_id, screen_name, num_favs, description) VALUES (?, ?, ?, ?)''', (ids, names, favs, des))
 
+# loop through umich_tweets to select the necessary information by nesting
 for a in umich_tweets:
 	tweet_ids = a['id_str']
 	texts = a['text']
@@ -151,40 +154,63 @@ conn.commit()
 # Make a query to select all of the records in the Users database. 
 # Save the list of tuples in a variable called users_info.
 
-users_info = True
+users_info = []
+# select all records from Users table to a variable users_info
+rows = cur.execute('SELECT * FROM Users')
+for ids, names, favs, des in rows:
+	users_info.append((ids, names, favs, des))
 
 # Make a query to select all of the user screen names from the database. 
 # Save a resulting list of strings (NOT tuples, the strings inside them!) 
 # in the variable screen_names. HINT: a list comprehension will make 
 # this easier to complete! 
-screen_names = True
+
+screen_names = []
+names = cur.execute('SELECT screen_name FROM Users')
+for name in names:
+	for elem in name:
+		screen_names.append(elem)
 
 
 # Make a query to select all of the tweets (full rows of tweet information)
 # that have been retweeted more than 10 times. Save the result 
 # (a list of tuples, or an empty list) in a variable called retweets.
-retweets = True
+retweets = []
+tweets_all = cur.execute('SELECT * FROM Tweets WHERE retweets > 10')
+for ids, texts, users, times, rts in tweets_all:
+	retweets.append((ids, texts, users, times, rts))
 
 
 # Make a query to select all the descriptions (descriptions only) of 
 # the users who have favorited more than 500 tweets. Access all those 
 # strings, and save them in a variable called favorites, 
 # which should ultimately be a list of strings.
-favorites = True
+favorites = []
+descriptions = cur.execute('SELECT description FROM Users WHERE num_favs > 500')
+for des in descriptions:
+	for d in des:
+		favorites.append(d)		
 
 
 # Make a query using an INNER JOIN to get a list of tuples with 2 
 # elements in each tuple: the user screenname and the text of the 
 # tweet. Save the resulting list of tuples in a variable called joined_data2.
-joined_data = True
+joined_data = []
+names_texts = cur.execute('SELECT Users.screen_name, Tweets.text FROM Users INNER JOIN Tweets ON Tweets.user_posted = Users.user_id')
+for name, text in names_texts:
+	joined_data.append((name, text))
+print(joined_data)
 
 # Make a query using an INNER JOIN to get a list of tuples with 2 
 # elements in each tuple: the user screenname and the text of the 
 # tweet in descending order based on retweets. Save the resulting 
 # list of tuples in a variable called joined_data2.
 
-joined_data2 = True
-
+# joined_data2 = []
+# names_texts_desc = cur.execute('SELECT Users.screen_name, Tweets.text FROM Users INNER JOIN Tweets ON Tweets.user_posted = Users.user_id ORDER BY Tweets.retweets DESC')
+# for name, text in names_texts:
+# 	joined_data2.append((name, text))
+# print(joined_data2)
 
 ### IMPORTANT: MAKE SURE TO CLOSE YOUR DATABASE CONNECTION AT THE END 
 ### OF THE FILE HERE SO YOU DO NOT LOCK YOUR DATABASE (it's fixable, 
