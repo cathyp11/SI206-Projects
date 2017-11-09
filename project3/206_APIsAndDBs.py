@@ -117,6 +117,7 @@ for i in umich_tweets:
 
 # loop through umich_tweets to select the necessary information by nesting
 for a in umich_tweets:
+	# selecting the information 
 	tweet_ids = a['id_str']
 	texts = a['text']
 	user_posts = a['user']['id']
@@ -166,8 +167,10 @@ for ids, names, favs, des in rows:
 # this easier to complete! 
 
 screen_names = []
+# select screen_name in Users
 names = cur.execute('SELECT screen_name FROM Users')
 for name in names:
+	# loop through each tuple to access the strings inside
 	for elem in name:
 		screen_names.append(elem)
 
@@ -177,6 +180,7 @@ for name in names:
 # (a list of tuples, or an empty list) in a variable called retweets.
 retweets = []
 tweets_all = cur.execute('SELECT * FROM Tweets WHERE retweets > 10')
+# select all to create tuple for each row
 for ids, texts, users, times, rts in tweets_all:
 	retweets.append((ids, texts, users, times, rts))
 
@@ -188,6 +192,7 @@ for ids, texts, users, times, rts in tweets_all:
 favorites = []
 descriptions = cur.execute('SELECT description FROM Users WHERE num_favs > 500')
 for des in descriptions:
+	# loop through each tupble to access the strings inside
 	for d in des:
 		favorites.append(d)		
 
@@ -196,25 +201,27 @@ for des in descriptions:
 # elements in each tuple: the user screenname and the text of the 
 # tweet. Save the resulting list of tuples in a variable called joined_data2.
 joined_data = []
+# use Tweets.user_posted as foreign key to connect to Users.user_id
 names_texts = cur.execute('SELECT Users.screen_name, Tweets.text FROM Users INNER JOIN Tweets ON Tweets.user_posted = Users.user_id')
 for name, text in names_texts:
 	joined_data.append((name, text))
-print(joined_data)
 
 # Make a query using an INNER JOIN to get a list of tuples with 2 
 # elements in each tuple: the user screenname and the text of the 
 # tweet in descending order based on retweets. Save the resulting 
 # list of tuples in a variable called joined_data2.
 
-# joined_data2 = []
-# names_texts_desc = cur.execute('SELECT Users.screen_name, Tweets.text FROM Users INNER JOIN Tweets ON Tweets.user_posted = Users.user_id ORDER BY Tweets.retweets DESC')
-# for name, text in names_texts:
-# 	joined_data2.append((name, text))
-# print(joined_data2)
+joined_data2 = []
+# similar to joined_data, but with ORDER BY based on retweets in descending order
+names_texts_desc = cur.execute('SELECT Users.screen_name, Tweets.text FROM Users INNER JOIN Tweets ON Tweets.user_posted = Users.user_id ORDER BY Tweets.retweets DESC')
+for name, text in names_texts:
+	joined_data2.append((name, text))
 
 ### IMPORTANT: MAKE SURE TO CLOSE YOUR DATABASE CONNECTION AT THE END 
 ### OF THE FILE HERE SO YOU DO NOT LOCK YOUR DATABASE (it's fixable, 
 ### but it's a pain). ###
+
+# close both cur and conn to not lock the database
 cur.close()
 conn.close()
 
