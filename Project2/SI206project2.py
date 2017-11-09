@@ -62,7 +62,6 @@ def grab_headlines():
     	read = headline.text.strip()
         # split the string and list all the titles as list
     	most = read.split("\n")
-    print(urllib.request.urlopen(url).read())
     return most
 
 
