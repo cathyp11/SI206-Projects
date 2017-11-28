@@ -9,7 +9,7 @@ import gmplot
 from yelpapi import YelpAPI
 from instagram.client import InstagramAPI
 
-access_token = "EAACEdEose0cBAMBUqFT5vJXA6IuhbqjLTZC2WCU4hsDZAqZCrWCFFmb5E1S7hjtP2n9ZBZBzuswEfSs8Y2ZC9HTvNAHH82iOaYpmcJ8LglEHjSbMTFn0GD0GTpIr0rHnqZBKJdZCJZAuL9SaTgQJompOClJRGGhCUDvZAZCLIW6NFEmwlvVKjZC683HtARkdSnvuiM3qLsKP9Jix5QZDZD"
+# access_token = "EAACEdEose0cBAMBUqFT5vJXA6IuhbqjLTZC2WCU4hsDZAqZCrWCFFmb5E1S7hjtP2n9ZBZBzuswEfSs8Y2ZC9HTvNAHH82iOaYpmcJ8LglEHjSbMTFn0GD0GTpIr0rHnqZBKJdZCJZAuL9SaTgQJompOClJRGGhCUDvZAZCLIW6NFEmwlvVKjZC683HtARkdSnvuiM3qLsKP9Jix5QZDZD"
 
 CACHE_FB = 'cache_fb.json'
 CACHE_YELP = 'cache_yelp.json'
@@ -36,6 +36,7 @@ inst_client_status = "946aee55e6b34980aac30f2fa44fef95"
 inst_access_token = "511092312.c9858f0.d705094e52bf4ca78fc536ec117ced60"
 
 places_key = "AIzaSyCytCUed9RpF5GEmMl5t4Pakx_Asp3bTs0"
+geo_key = "AIzaSyCRq7G6004a_ADdAf5MFE11NUU37GCIkuY"
 
 def Caching_FB(user):
 	if user in CACHE_DICTION_fb:
@@ -99,17 +100,21 @@ def Caching_Yelp():
 # # user = inst.user(user_id = 'cathyyp11')
 # print(user)
 
-baseurl_id = 'https://api.instagram.com/v1/tags/fritabatidos/media/recent?access_token=' + inst_access_token +'&min_tag_id=1387332980547'
-responses = urllib.request.urlopen(baseurl_id)
-jsonreads = responses.read()
-reads = json.loads(jsonreads)
-print(reads)
+# baseurl_id = 'https://api.instagram.com/v1/tags/fritabatidos/media/recent?access_token=' + inst_access_token +'&min_tag_id=1387332980547'
+# responses = urllib.request.urlopen(baseurl_id)
+# jsonreads = responses.read()
+# reads = json.loads(jsonreads)
+# print(reads)
+# 'https://maps.googleapis.com/maps/api/geocode/json?address=' + city + '&key=' + places_key
+# https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=-33.8670522,151.1957362&radius=500&type=restaurant&keyword=cruise&key=YOUR_API_KEY
+url = 'https://maps.googleapis.com/maps/api/geocode/json?address=Ann+Arbor&key=' + geo_key
 
-url = 'https://maps.googleapis.com/maps/api/place/radarsearch/json?location=51.503186,-0.126446&radius=5000&type=museum&key=' + places_key
+# url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=51.503186,-0.126446&radius=500&type=restaurant&key=' + places_key
 response = urllib.request.urlopen(url)
 jsonread = response.read()
 read = json.loads(jsonread)
-# print(read)
+print(read)
+print(read['results'][0]['geometry']['location'])
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
