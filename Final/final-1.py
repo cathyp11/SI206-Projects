@@ -35,6 +35,7 @@ inst_client_status = "946aee55e6b34980aac30f2fa44fef95"
 # f38f5c54532e45febe53818643aeb766
 inst_access_token = "511092312.c9858f0.d705094e52bf4ca78fc536ec117ced60"
 
+yelp_access_token = "ztsjq_LquhhLU5ABi4zWOIOISD-jy8UiWijyAzLb0yV7MChsj3pLa6ZP6yruRkTdS6M2SRvm3olECWEx6GTsE1JLEDkkHWS5oyWYYYSFfbAodGQ0-NmJFQMshTATWnYx"
 places_key = "AIzaSyCytCUed9RpF5GEmMl5t4Pakx_Asp3bTs0"
 geo_key = "AIzaSyCRq7G6004a_ADdAf5MFE11NUU37GCIkuY"
 
@@ -107,14 +108,24 @@ def Caching_Yelp():
 # print(reads)
 # 'https://maps.googleapis.com/maps/api/geocode/json?address=' + city + '&key=' + places_key
 # https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=-33.8670522,151.1957362&radius=500&type=restaurant&keyword=cruise&key=YOUR_API_KEY
-url = 'https://maps.googleapis.com/maps/api/geocode/json?address=Ann+Arbor&key=' + geo_key
+
+location = input('location: ')
+url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' + location + '&key=' + geo_key
 
 # url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=51.503186,-0.126446&radius=500&type=restaurant&key=' + places_key
+# 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=' + 51.503186,-0.126446 + '&radius=500&type=restaurant&key=' + places_key
+
+# url = "https://api.yelp.com/v3/businesses/search?term=restaurants&location=Ann+Arbor"
 response = urllib.request.urlopen(url)
 jsonread = response.read()
 read = json.loads(jsonread)
 print(read)
 print(read['results'][0]['geometry']['location'])
+
+# url = "https://api.yelp.com/oauth2/token"
+# response = requests.get(url, headers = {'Authorization': "Bearer " + yelp_access_token, 'token_type': "Bearer"})
+# jsonread = response.text
+# print(jsonread)
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

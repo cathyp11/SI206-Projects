@@ -1,113 +1,85 @@
 import unittest
 import json
-import httplib2
-import os
-from apiclient.discovery import build
-service = build('api_name', 'api_version', ...)
+import requests
+import urllib.request
 
-from apiclient import discovery
-from oauth2client import client
-from oauth2client import tools
-from oauth2client.file import Storage
-import quickstart
+yelp_access_token = "ztsjq_LquhhLU5ABi4zWOIOISD-jy8UiWijyAzLb0yV7MChsj3pLa6ZP6yruRkTdS6M2SRvm3olECWEx6GTsE1JLEDkkHWS5oyWYYYSFfbAodGQ0-NmJFQMshTATWnYx"
+places_key = "AIzaSyCytCUed9RpF5GEmMl5t4Pakx_Asp3bTs0"
+geo_key = "AIzaSyCRq7G6004a_ADdAf5MFE11NUU37GCIkuY"
 
-# access_token = "EAACEdEose0cBAFhKsHXIFkb09KcMUNecCiHD2HeXctxHZCY4X7Qb3ZC6eOjvGX6zTrhhmKwA91m6q8yOSMbMVemgb91Ko67qJHjZB4KTWmeXP3fQvoLLNhyMHQZAzv93LIY0c4AgLABvbD5Bm4hbI9mQq1Ol85xY6rdSbu80l1XBZCkeMKAaGwEMISZBHZBgnIURBYtO362yQZDZD"
+CACHE_YELP = 'cache_yelp.json'
+CACHE_PLACES = 'cache_places.json'
 
-# r = requests.get("https://graph.facebook.com/v2.11/me/feed",params={"limit":2, "access_token":access_token})
-# if r.status_code != 200:
-#     access_token = raw_input("Get a Facebook access token v2.11 from https://developers.facebook.com/tools/explorer and enter it here if the one saved in the file doesn't work anymore.  :\n")
+try:
+    cache_file_places = open(CACHE_PLACES, 'r')
+    cache_file_yelp = open(CACHE_YELP, 'r')
+    cache_contents_places = cache_file_places.read()
+    cache_contents_yelp = cache_file_yelp.read()
+    CACHE_DICTION_places = json.loads(cache_contents_places)
+    CACHE_DICTION_yelp = json.loads(cache_contents_yelp)
+    cache_file_places.close()
+    cache_file_yelp.close()
+except:
+    CACHE_DICTION_places = {}
+    CACHE_DICTION_yelp = {}
 
-# url_params = {}
-# url_params["access_token"] = access_token
-# url_params["fields"] = "comments{comments{like_count,from,message,created_time},like_count,from,message,created_time},likes,message,created_time,from" # Parameter key-value so you can get post message, comments, likes, etc. as described in assignment instructions.
-# url_params["limit"] = 10
+location = input("Enter a city: ")
 
-# def requestURL_fb(baseurl, params = {}):
-#     req = requests.Request(method = 'GET', url = baseurl, params = url_params)
-#     prepped = req.prepare()
-#     return prepped.url 
+def Caching_Yelp():
+	url = "https://api.yelp.com/v3/businesses/search?term=restaurants&offset=100&sort_by=rating&location=" + location 
+	if location in CACHE_DICTION_yelp:
+		print('using cache')
+		data_y = CACHE_DICTION_yelp[location]
+	else:
+		print('fetching')
+		yelp_api = requests.get(url, headers = {'Authorization': "Bearer " + yelp_access_token, 'token_type': "Bearer"})
+		data_y = yelp_api.text
+		CACHE_DICTION_yelp[location] = data_y
+		# dump the existing cached data
+		dumped_json_cache = json.dumps(CACHE_DICTION_yelp)
+		fw = open(CACHE_YELP,"w")
+		fw.write(dumped_json_cache)
+		fw.close() # Close the open file
+	return data_y
 
-# CACHE_FNAME = 'cache.json'
+def Geocode():
+	loc = location.replace(" ", "+")
+	geo_url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' + loc + '&key=' + geo_key
+	req = urllib.request.urlopen(geo_url)
+	read = req.read()
+	jsonread = json.loads(read)
+	lat = str(jsonread['results'][0]['geometry']['location']['lat'])
+	lng = str(jsonread['results'][0]['geometry']['location']['lng'])
+	return lat,lng
 
-# try:
-#     cache_file = open(CACHE_FNAME, 'r')
-#     cache_contents = cache_file.read()
-#     CACHE_DICTION = json.loads(cache_contents)
-#     cache_file.close()
-# except:
-#     CACHE_DICTION = {}
+def Caching_Places():
+	geo = Geocode()
+	places_url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=' + geo[0] + "," + geo[1] + '&radius=500&type=restaurant&key=' + places_key
+	if location in CACHE_DICTION_places:
+		print('using cache')
+		data_p = CACHE_DICTION_places[location]
+	else:
+		print('fetching')
+		places_api = urllib.request.urlopen(places_url)
+		jsonread = response.read()
+		data_p = json.loads(jsonread)
+		CACHE_DICTION_places[location] = data_p
+		dumped_json_cache = json.dumps(CACHE_DICTION_places)
+		fw = open(CACHE_PLACES, "w")
+		fw.write(dumped_json_cache)
+		fw.close()
+	return data_p
 
-# def getWithCaching(ID):
-#     baseurl_fb = "https://graph.facebook.com/v2.11/" + ID + "/feed"
-#     full_url_fb = requestURL_fb(baseurl_fb, params = url_params)
+read = Caching_Yelp()
+print(read)
+places = Caching_Places()
+print(places)
 
-#     if full_url_fb in CACHE_DICTION:
-#         print 'using cache'
-#         response_text = CACHE_DICTION[full_url_fb]
-#     else:
-#         print 'fetching'
-#         fb_response = requests.get(full_url_fb)
-#         CACHE_DICTION[full_url_fb] = fb_response.text
-#         response_text = fb_response.text
+for place in places['results']:
 
-#         cache_file = open(CACHE_FNAME, 'w')
-#         cache_file.write(json.dumps(CACHE_DICTION))
-#         cache_file.close()
 
-#     return response_text
-def get_credentials():
-    """Gets valid user credentials from storage.
-
-    If nothing has been stored, or if the stored credentials are invalid,
-    the OAuth2 flow is completed to obtain the new credentials.
-
-    Returns:
-        Credentials, the obtained credential.
-    """
-    home_dir = os.path.expanduser('~')
-    credential_dir = os.path.join(home_dir, '.credentials')
-    if not os.path.exists(credential_dir):
-        os.makedirs(credential_dir)
-    credential_path = os.path.join(credential_dir,
-                                   'gmail-python-quickstart.json')
-
-    store = Storage(credential_path)
-    credentials = store.get()
-    if not credentials or credentials.invalid:
-        flow = client.flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
-        flow.user_agent = APPLICATION_NAME
-        if flags:
-            credentials = tools.run_flow(flow, store, flags)
-        else: # Needed only for compatibility with Python 2.6
-            credentials = tools.run(flow, store)
-        print('Storing credentials to ' + credential_path)
-    return credentials
-
-def main():
-    """Shows basic usage of the Gmail API.
-
-    Creates a Gmail API service object and outputs a list of label names
-    of the user's Gmail account.
-    """
-    credentials = get_credentials()
-    http = credentials.authorize(httplib2.Http())
-    service = discovery.build('gmail', 'v1', http=http)
-
-    results = service.users().labels().list(userId='me').execute()
-    labels = results.get('labels', [])
-    msgs = service.users().messages().list(userId='me', maxResults=500).execute()
-    print(msgs)
-
-    if not labels:
-        print('No labels found.')
-    else:
-      print('Labels:')
-      for label in labels:
-        print(label['name'])
 
 
 if __name__ == '__main__':
-    main()
-# service = discovery.build('gmail', 'v1', http=http)
-# msgs = service.users().messages().list(userId='me', maxResults=500).execute()
-# print(msgs)
+    unittest.main(verbosity=2)
+
