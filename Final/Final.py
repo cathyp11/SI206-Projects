@@ -23,7 +23,8 @@ except:
     CACHE_DICTION_places = {}
     CACHE_DICTION_yelp = {}
 
-location = input("Enter a city: ")
+# location = input("Enter a city: ")
+location = 'ann arbor'
 
 def Caching_Yelp():
 	url = "https://api.yelp.com/v3/businesses/search?term=restaurants&offset=100&sort_by=rating&location=" + location 
@@ -61,7 +62,7 @@ def Caching_Places():
 	else:
 		print('fetching')
 		places_api = urllib.request.urlopen(places_url)
-		jsonread = response.read()
+		jsonread = places_api.read()
 		data_p = json.loads(jsonread)
 		CACHE_DICTION_places[location] = data_p
 		dumped_json_cache = json.dumps(CACHE_DICTION_places)
@@ -70,14 +71,29 @@ def Caching_Places():
 		fw.close()
 	return data_p
 
-read = Caching_Yelp()
-print(read)
-places = Caching_Places()
-print(places)
+def Places_Rating():
+	placeids = []
+	places = Caching_Places()
+	for place in places['results']:
+		placeids.append(place['place_id'])
+	for placeid in placeids:
+		places_ids_url = 'https://maps.googleapis.com/maps/api/place/details/json?placeid=' + placeid +'&key=' + places_key
+		places_ids_api = urllib.request.urlopen(places_ids_url)
+		jsons = places_ids_api.read()
+		data_ids = json.loads(jsons)
+	return data_ids
 
-for place in places['results']:
 
+# read = Caching_Yelp()
+# print(read)
+# places = Caching_Places()
+# print(places)
 
+# for place in places['results']:
+# 	print(place['place_id'])
+
+p = Places_Rating()
+print(p)
 
 
 if __name__ == '__main__':
