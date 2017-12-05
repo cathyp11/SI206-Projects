@@ -9,7 +9,7 @@ import gmplot
 from yelpapi import YelpAPI
 from instagram.client import InstagramAPI
 
-# access_token = "EAACEdEose0cBAMBUqFT5vJXA6IuhbqjLTZC2WCU4hsDZAqZCrWCFFmb5E1S7hjtP2n9ZBZBzuswEfSs8Y2ZC9HTvNAHH82iOaYpmcJ8LglEHjSbMTFn0GD0GTpIr0rHnqZBKJdZCJZAuL9SaTgQJompOClJRGGhCUDvZAZCLIW6NFEmwlvVKjZC683HtARkdSnvuiM3qLsKP9Jix5QZDZD"
+access_token = "EAACEdEose0cBABWYcYmrXOHDowkN9sHueBgpD6KxOafhZCu9lfJRlwSykZCMBZBdYyckal3Hnp82ObwdbUoLD0C9zZCEuq2WLy8pkKvwLVI7zPp2Kkepsp2ZAB4W0cop9pQZC6g4uZCNPv0aDH7DU2ZBWBNdv4P4zpZAWCBrRLGQqNXZBta49VqtIkDFBeQSy61AKmlZBXU8GgSBwZDZD"
 
 CACHE_FB = 'cache_fb.json'
 CACHE_YELP = 'cache_yelp.json'
@@ -46,7 +46,7 @@ def Caching_FB(user):
 	else:
 		print('fetching')
 		graph = facebook.GraphAPI(access_token)
-		data = graph.get_object(id=user, fields='posts')
+		data = graph.search(type = 'page')
 		CACHE_DICTION_fb[user] = data
 		# dump the existing cached data
 		dumped_json_cache = json.dumps(CACHE_DICTION_fb)
@@ -73,8 +73,8 @@ def Caching_Yelp():
 	return data_y
 
 
-# posts = Caching_FB("FritaBatidos")
-# print(posts)
+posts = Caching_FB("FritaBatidos")
+print(posts)
 # yelp = Caching_Yelp()
 # print(yelp)
 
@@ -109,23 +109,47 @@ def Caching_Yelp():
 # 'https://maps.googleapis.com/maps/api/geocode/json?address=' + city + '&key=' + places_key
 # https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=-33.8670522,151.1957362&radius=500&type=restaurant&keyword=cruise&key=YOUR_API_KEY
 
-location = input('location: ')
-url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' + location + '&key=' + geo_key
+# location = input('location: ')
+# url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' + location + '&key=' + geo_key
 
 # url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=51.503186,-0.126446&radius=500&type=restaurant&key=' + places_key
 # 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=' + 51.503186,-0.126446 + '&radius=500&type=restaurant&key=' + places_key
 
 # url = "https://api.yelp.com/v3/businesses/search?term=restaurants&location=Ann+Arbor"
-response = urllib.request.urlopen(url)
-jsonread = response.read()
-read = json.loads(jsonread)
-print(read)
-print(read['results'][0]['geometry']['location'])
+# response = urllib.request.urlopen(url)
+# jsonread = response.read()
+# read = json.loads(jsonread)
+# print(read)
+# print(read['results'][0]['geometry']['location'])
 
 # url = "https://api.yelp.com/oauth2/token"
 # response = requests.get(url, headers = {'Authorization': "Bearer " + yelp_access_token, 'token_type': "Bearer"})
 # jsonread = response.text
 # print(jsonread)
+
+#----------------------
+# def Places_Reviews():
+# 	placeids = []
+# 	data_ids = []
+# 	places = Caching_Places()
+# 	if location in CACHE_DICTION_reviews:
+# 		print('using cache')
+# 		data_ids = CACHE_DICTION_reviews[location]
+# 	else:
+# 		for place in places['results']:
+# 			placeids.append(place['place_id'])
+# 		for placeid in placeids:
+# 			places_ids_url = 'https://maps.googleapis.com/maps/api/place/details/json?placeid=' + placeid +'&key=' + places_key
+# 			places_ids_api = urllib.request.urlopen(places_ids_url)
+# 			jsons = places_ids_api.read()
+# 			data_ids.append(json.loads(jsons))
+# 		CACHE_DICTION_reviews[location] = data_ids
+# 		dumped_json_cache = json.dumps(CACHE_DICTION_reviews)
+# 		fw = open(CACHE_Reviews, "w")
+# 		fw.write(dumped_json_cache)
+# 		fw.close()
+# 	return data_ids
+#-----------------------
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
