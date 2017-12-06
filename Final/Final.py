@@ -345,6 +345,19 @@ ye = Caching_Yelp()
 # plotting = [go.Bar(x = list(dic.keys()), y = list(dic.values()))]
 # py.iplot(plotting, filename='categories')
 
+## Visualization - gmplot
+# gmap = gmplot.from_geocode('Ann Arbor')
+lat = []
+lng = []
+geos = cur.execute('SELECT lat, lng FROM Geocode')
+for ge in geos:
+	# loop through each tuple to access the strings inside
+	for lat, lng in ge:
+# 		lat.append(i)
+# 		lng.append(j)
+		gmap.scatter(lat, lng, '#3B0B39', size=40, marker=False)
+
+
 ## Visualization 3 - Boxplot
 # plotting a boxplot with the ratings from Yelp Reviews
 ratings = []
